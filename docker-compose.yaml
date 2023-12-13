@@ -1,0 +1,38 @@
+version: '3'
+services:
+
+  dremio:
+    image: dremio/dremio-oss
+    container_name: dremio
+    ports:
+      - 9047:9047
+      - 31010:31010
+      - 45678:45678
+    volumes:
+      - ./dremio:/opt/dremio/data
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+    networks:
+      - ete_network
+
+  #! MySQL
+  co_mysql:
+    image: mysql:latest
+    container_name: co_mysql
+    volumes:
+      - ./mysql:/var/lib/mysql
+    ports:
+      - "3305:3306"
+    env_file:
+      - .env
+    networks:
+      - ete_network
+
+networks:
+  ete_network:
+    driver: bridge
+    name: ete_network
